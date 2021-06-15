@@ -1,82 +1,66 @@
 from enum import IntFlag
+from threading import Lock
 from time import sleep
 import vgamepad as vg
 
 
-buttons = {
-    # "ps": 1 << 0,
-    # "touchpad": 1 << 1,
-    "square": 1 << 4,
-    "x": 1 << 5,
-    "circle": 1 << 6,
-    "triangle": 1 << 7,
-}
-
-dpad_left = 0x6
-dpad_right = 0x2
-
-
 class Controller:
+
+    one_frame = 1/30
+    two_frames = 2/30
+
     def __init__(self):
         self.gamepad = vg.VDS4Gamepad()
+        self.lock = Lock()
 
     def tap(self, button):
-        self.gamepad.press_button(button)
-        self.gamepad.update()
-        sleep(1 / 30)
-        self.gamepad.release_button(button)
-        self.gamepad.update()
-        sleep(0.08)
-
-    def hold(self, button, time=1):
-        self.gamepad.press_button(button)
-        self.gamepad.update()
-        sleep(time)
-        self.gamepad.release_button(button)
-        self.gamepad.update()
-        sleep(1 / 30)
-
-    def tapall(self):
-        for v in buttons.values():
-            self.gamepad.press_button(v)
+        """ Emulates button tap """
+        with self.lock:
+            self.gamepad.press_button(button)
             self.gamepad.update()
-        sleep(1 / 30)
-        for v in buttons.values():
-            self.gamepad.release_button(v)
+            sleep(Controller.one_frame)
+            self.gamepad.release_button(button)
             self.gamepad.update()
-        sleep(0.08)
+            sleep(Controller.two_frames)
 
-    def left(self):
-        self.gamepad.directional_pad(dpad_left)
-        self.gamepad.update()
-        sleep(1 / 30)
-        self.gamepad.reset()
-        self.gamepad.update()
-        sleep(0.08)
+    def hold(self, button, seconds=1):
+        """ Emulates button hold for amount given in seconds """
+        with self.lock:
+            self.gamepad.press_button(button)
+            self.gamepad.update()
+            sleep(seconds)
+            self.gamepad.release_button(button)
+            self.gamepad.update()
+            sleep(Controller.two_frames)
 
-    def right(self):
-        self.gamepad.directional_pad(dpad_right)
-        self.gamepad.update()
-        sleep(1 / 30)
-        self.gamepad.reset()
-        self.gamepad.update()
-        sleep(0.08)
+    def dpad(self, direction):
+        """ Emulates tapping of a dpad direction """
+        with self.lock:
+            self.gamepad.directional_pad(direction)
+            self.gamepad.update()
+            sleep(Controller.one_frame)
+            self.gamepad.directional_pad(0x8) # dpad None
+            self.gamepad.update()
+            sleep(Controller.two_frames)
+
+    def trigger(self, which_trigger, amount=1.0):
+        """ Emulates a trigger pull (and release) for given amount """
+        trigger_pull = self.gamepad.right_trigger_float if which_trigger == 'r2' else self.gamepad.left_trigger_float if which_trigger == 'l2' else None
+        if trigger_pull is None:
+            raise Exception()
+        with self.lock:
+            trigger_pull(value_float=amount)
+            sleep(Controller.one_frame)
+            trigger_pull(value_float=0.0)
+            sleep(Controller.two_frames)
 
 
 if __name__ == "__main__":
-    from random import choice, seed
-    from time import sleep
+    from const import buttons
 
     controller = Controller()
-    print("focus window")
-    sleep(3)
-    seed()
+    sleep(Controller.two_frames)
 
-    # for i in range(10):
-    #     random_button = choice(list(buttons.keys()))
-    #     print(random_button)
-    #     controller.tap(buttons[random_button])
-    #     sleep(1)
     controller.left()
     controller.right()
     controller.left()
