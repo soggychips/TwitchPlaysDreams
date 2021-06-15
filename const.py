@@ -19,5 +19,3 @@ dpad_directions = {
 }
 
 triggers = ['r2', 'l2']
-
-longest_command_length = 8
