@@ -1,6 +1,5 @@
 import asyncio
-from TestController import Controller
-# from Controller import Controller
+from Controller import Controller
 from const import buttons, dpad_directions, triggers
 from time import sleep
 

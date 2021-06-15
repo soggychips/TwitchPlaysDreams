@@ -1,4 +1,4 @@
 *.pyc
 config
-TestController.py
 client_test.py
+vgamepad.py # shell class used for testing on Mac OS where vgamepad is unavailable
