@@ -1,4 +1,3 @@
-from enum import IntFlag
 from threading import Lock
 from time import sleep
 import vgamepad as vg

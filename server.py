@@ -44,8 +44,6 @@ async def forever():
 async def main():
     print("Starting UDP server")
 
-    # Get a reference to the event loop as we plan to use
-    # low-level APIs.
     loop = asyncio.get_event_loop()
 
     # One protocol instance will be created to serve all
