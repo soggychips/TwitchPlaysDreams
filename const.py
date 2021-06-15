@@ -12,14 +12,12 @@ buttons = {
 
 dpad_directions = {
     'up': 0x0,
-    'u': 0x0,
     'right': 0x2,
-    'r': 0x2,
     'down': 0x4,
-    'd': 0x4,
     'left': 0x6,
-    'l': 0x6,
     # None : 0x8
 }
 
 triggers = ['r2', 'l2']
+
+longest_command_length = 8
