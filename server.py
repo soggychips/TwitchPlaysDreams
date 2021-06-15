@@ -1,6 +1,6 @@
 import asyncio
 from Controller import Controller
-from const import buttons, dpad_directions, triggers
+from const import buttons, dpad_directions, triggers, longest_command_length
 from time import sleep
 
 class ControllerManagerProtocol:
@@ -24,6 +24,9 @@ class ControllerManagerProtocol:
 
     def parse_controller_command(self, message):
         message = message.lower().strip()
+        if len(message) > longest_command_length:
+            return # this is not a command
+        # taps
         if message in buttons.keys():
             print("Pressing {}".format(message))
             self.controller.tap(message)
