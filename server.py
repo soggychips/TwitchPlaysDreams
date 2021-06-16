@@ -1,15 +1,17 @@
+import argparse
 import asyncio
 from Controller import Controller
 from const import buttons, dpad_directions, triggers
 from time import sleep
 
-class ControllerManagerProtocol:
 
-    def __init__(self):
+class ControllerManagerProtocol:
+    def __init__(self, verbose=False):
+        self.verbose = verbose
         self.controller = Controller()
         sleep(1)
         super().__init__()
-        
+
     def connection_made(self, transport):
         print("Connected")
         self.transport = transport
@@ -26,31 +28,34 @@ class ControllerManagerProtocol:
         message = message.lower().strip()
         # taps
         if message in buttons.keys():
-            print("Pressing {}".format(message))
+            if self.verbose:
+                print("Pressing {}".format(message))
             self.controller.tap(message)
         elif message in dpad_directions.keys():
-            print("Pressing DPAD {}".format(message))
+            if self.verbose:
+                print("Pressing DPAD {}".format(message))
             self.controller.dpad(message)
         elif message in triggers:
-            print("Pressing trigger {}".format(message))
+            if self.verbose:
+                print("Pressing trigger {}".format(message))
             self.controller.trigger(message, amount=1)
         else:
             print("Unsupported message: {}".format(message))
-        
+
+
 async def forever():
     while True:
         await asyncio.sleep(1)
 
-async def main():
+
+async def main(verbose):
     print("Starting UDP server")
 
     loop = asyncio.get_event_loop()
 
-    # One protocol instance will be created to serve all
-    # client requests.
     transport, protocol = await loop.create_datagram_endpoint(
-        lambda: ControllerManagerProtocol(),
-        local_addr=('127.0.0.1', 9999))
+        lambda: ControllerManagerProtocol(verbose), local_addr=("127.0.0.1", 9999)
+    )
 
     try:
         await forever()
@@ -58,12 +63,19 @@ async def main():
         transport.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser("TwitchPlaysDreams Server")
+    parser.add_argument("--verbose", "-v", default=False, action="store_true")
+    args = parser.parse_args()
+
     try:
-        asyncio.run(main())
+        asyncio.run(main(args.verbose))
     except KeyboardInterrupt:
         pass
     except Exception as e:
         print("Uh oh! There was an unexpected error!")
-        print("If this happens again, contact VinceKully (Twitter: @VinceKully) or The_Timme")
+        print(
+            "If this happens again, contact VinceKully (Twitter: @VinceKully) or The_Timme"
+        )
         print("Copy the following: {}".format(e))
