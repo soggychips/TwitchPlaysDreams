@@ -1,23 +1,27 @@
 import argparse
 import asyncio
+import logging
+
+from time import sleep
+
 from Controller import Controller
 from const import buttons, dpad_directions, triggers
-from time import sleep
 
 
 class ControllerManagerProtocol:
     def __init__(self, verbose=False):
         self.verbose = verbose
         self.controller = Controller()
+        self.logger = logging.getLogger()
         sleep(1)
         super().__init__()
 
     def connection_made(self, transport):
-        print("Connected")
+        self.logger.info("Connected")
         self.transport = transport
 
     def connection_lost(self, exc):
-        print("Connection closed")
+        self.logger.info("Connection closed")
 
     def datagram_received(self, data, addr):
         message = data.decode()
@@ -28,19 +32,16 @@ class ControllerManagerProtocol:
         message = message.lower().strip()
         # taps
         if message in buttons.keys():
-            if self.verbose:
-                print("Pressing {}".format(message))
+            self.logger.debug("Pressing {}".format(message))
             self.controller.tap(message)
         elif message in dpad_directions.keys():
-            if self.verbose:
-                print("Pressing DPAD {}".format(message))
+            self.logger.debug("Pressing DPAD {}".format(message))
             self.controller.dpad(message)
         elif message in triggers:
-            if self.verbose:
-                print("Pressing trigger {}".format(message))
+            self.logger.debug("Pressing trigger {}".format(message))
             self.controller.trigger(message, amount=1)
         else:
-            print("Unsupported message: {}".format(message))
+            self.logger.warning("Unsupported message: {}".format(message))
 
 
 async def forever():
@@ -49,7 +50,8 @@ async def forever():
 
 
 async def main(verbose):
-    print("Starting UDP server")
+    logger = logging.getLogger()
+    logger.info("Starting UDP server")
 
     loop = asyncio.get_event_loop()
 
@@ -64,18 +66,28 @@ async def main(verbose):
 
 
 if __name__ == "__main__":
-
+    # parse args
     parser = argparse.ArgumentParser("TwitchPlaysDreams Server")
     parser.add_argument("--verbose", "-v", default=False, action="store_true")
+    parser.add_argument(
+        "--logfile", type=str, default="./twitchplays.log", action="store"
+    )
     args = parser.parse_args()
-
+    # set up logger
+    logging.basicConfig(
+        filename=args.logfile,
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(asctime)s:%(name)s:%(levelname)s:%(message)s",
+        filemode="w",
+    )
+    logger = logging.getLogger()
     try:
         asyncio.run(main(args.verbose))
     except KeyboardInterrupt:
         pass
     except Exception as e:
-        print("Uh oh! There was an unexpected error!")
-        print(
+        logger.error("Uh oh! There was an unexpected error!")
+        logger.error(
             "If this happens again, contact VinceKully (Twitter: @VinceKully) or The_Timme"
         )
-        print("Copy the following: {}".format(e))
+        logger.error("Copy the following: {}".format(e))
