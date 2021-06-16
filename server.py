@@ -68,9 +68,19 @@ async def main(verbose):
 if __name__ == "__main__":
     # parse args
     parser = argparse.ArgumentParser("TwitchPlaysDreams Server")
-    parser.add_argument("--verbose", "-v", default=False, action="store_true")
     parser.add_argument(
-        "--logfile", type=str, default="./twitchplays.log", action="store"
+        "--verbose",
+        "-v",
+        default=False,
+        action="store_true",
+        help="Will print more info to the log (i.e. all actions)",
+    )
+    parser.add_argument(
+        "--logfile",
+        type=str,
+        default="./twitchplays.log",
+        action="store",
+        help="Set the logfile. Default is twitchplays.log in the current directory",
     )
     args = parser.parse_args()
     # set up logger
