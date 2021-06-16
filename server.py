@@ -9,8 +9,7 @@ from const import buttons, dpad_directions, triggers
 
 
 class ControllerManagerProtocol:
-    def __init__(self, verbose=False):
-        self.verbose = verbose
+    def __init__(self):
         self.controller = Controller()
         self.logger = logging.getLogger()
         sleep(1)
@@ -49,14 +48,14 @@ async def forever():
         await asyncio.sleep(1)
 
 
-async def main(verbose):
+async def main():
     logger = logging.getLogger()
     logger.info("Starting UDP server")
 
     loop = asyncio.get_event_loop()
 
     transport, protocol = await loop.create_datagram_endpoint(
-        lambda: ControllerManagerProtocol(verbose), local_addr=("127.0.0.1", 9999)
+        lambda: ControllerManagerProtocol(), local_addr=("127.0.0.1", 9999)
     )
 
     try:
@@ -92,7 +91,7 @@ if __name__ == "__main__":
     )
     logger = logging.getLogger()
     try:
-        asyncio.run(main(args.verbose))
+        asyncio.run(main())
     except KeyboardInterrupt:
         pass
     except Exception as e:
