@@ -1,8 +1,11 @@
 # TwitchPlaysDreams Server
 
 <h3> About </h3>
-    As of right now, this only works on Windows 10. I'll be looking into adding Mac OS support in the future.
-    
+
+As of right now, this only works on Windows 10. I'll be looking into adding Mac OS support in the future.
+
+Controller is emulated using [vgamepad](https://github.com/yannbouteiller/vgamepad)
+
 <h3> Install </h3>
 
 First, you'll need to install the [ViGEmBus Driver](https://github.com/ViGEm/ViGEmBus/releases/tag/setup-v1.17.333)
