@@ -1,4 +1,5 @@
 *.pyc
+.vscode/
 config
 vgamepad.py
 client_test.py
