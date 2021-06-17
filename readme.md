@@ -39,7 +39,7 @@ All messages need to be sent over UDP, in the following formats:
         'length': <float>
     }
 
-where floats can be from -1.0 to 1.0, and amount can be from 0.0 to 1.0
+where `amount` floats can be from -1.0 to 1.0, and `length` floats can be from 0.0 to 1.0
 
 <h4> Taps </h4>
 
