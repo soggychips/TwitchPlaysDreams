@@ -144,7 +144,7 @@ Combinations will apply each message at the same time, and hold it for the longe
         }
     ]
 
-<b>Example: </b>Press the left trigger 3/4, and hold circle for a second
+<b>Example: </b>Hold the left trigger 3/4, and hold circle for a second
 
     [
         {
