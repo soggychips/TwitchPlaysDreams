@@ -32,10 +32,10 @@ class ControllerManagerProtocol:
         # taps
         if message in buttons.keys():
             self.logger.debug("Pressing {}".format(message))
-            self.controller.tap(message)
+            self.controller.tap(buttons[message])
         elif message in dpad_directions.keys():
             self.logger.debug("Pressing DPAD {}".format(message))
-            self.controller.dpad(message)
+            self.controller.dpad(dpad_directions[message])
         elif message in triggers:
             self.logger.debug("Pressing trigger {}".format(message))
             self.controller.trigger(message, amount=1)
