@@ -5,7 +5,7 @@ import logging
 from time import sleep
 
 from Controller import Controller
-from const import buttons, dpad_directions, triggers
+from const import buttons, dpad_directions, triggers, sticks
 
 
 class ControllerManagerProtocol:
@@ -28,6 +28,14 @@ class ControllerManagerProtocol:
         self.parse_controller_command(message)
 
     def parse_controller_command(self, message):
+        if isinstance(message, dict):
+            pass
+        elif isinstance(message, list):
+            pass
+        else:
+            self.logger.warning("Unsupported message format.")
+
+    def parse_controller_command_old(self, message):
         message = message.lower().strip()
         # taps
         if message in buttons.keys():
@@ -39,6 +47,9 @@ class ControllerManagerProtocol:
         elif message in triggers:
             self.logger.debug("Pressing trigger {}".format(message))
             self.controller.trigger(message, amount=1)
+        elif message in sticks:
+            self.logger.debug("Moving stick {}")
+            self.controller.stick(message, x_value_float=1.0, y_value_float=0.0)
         else:
             self.logger.warning("Unsupported message: {}".format(message))
 
