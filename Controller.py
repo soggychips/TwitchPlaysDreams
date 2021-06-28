@@ -24,7 +24,7 @@ class Controller:
         self.gamepad.directional_pad(dpad_directions[name])
 
     def stick(self, name, amount):
-        if name == "r":
+        if name in ("r", 'right'):
             self.gamepad.right_joystick_float(*amount)
         else:
             self.gamepad.left_joystick_float(*amount)
