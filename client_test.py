@@ -20,7 +20,7 @@ class TestClientProtocol:
             "type": None,
             "name": None,
             "amount": None,
-            "length": 0 if random() < 0.9 else random(),
+            "length": 0 if random() < 0.5 else random(),
         }
         thing = choice(
             [
