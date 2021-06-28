@@ -37,20 +37,26 @@ class Controller:
     def single(self, func, **kwargs):
         length = kwargs.get("length", Controller.one_frame)
         with self.lock:
-            func(kwargs.get("name"), kwargs.get("amount", 1))
-            self.gamepad.update()
-            sleep(length)
-            self.release_all()
-            self.gamepad.update()
-            sleep(Controller.two_frames)
+            try:
+                func(kwargs.get("name"), kwargs.get("amount", 1))
+                self.gamepad.update()
+                sleep(length)
+                self.release_all()
+                self.gamepad.update()
+                sleep(Controller.two_frames)
+            except Exception as e:
+                raise e
 
     def combination(self, funcs, args):
         with self.lock:
-            length = max(arg.get("length", Controller.one_frame) for arg in args)
-            for func, kwargs in zip(funcs, args):
-                func(kwargs.get("name"), kwargs.get("amount", 1))
-            self.gamepad.update()
-            sleep(length)
-            self.release_all()
-            self.gamepad.update()
-            sleep(Controller.two_frames)
+            try:
+                length = max(arg.get("length", Controller.one_frame) for arg in args)
+                for func, kwargs in zip(funcs, args):
+                    func(kwargs.get("name"), kwargs.get("amount", 1))
+                self.gamepad.update()
+                sleep(length)
+                self.release_all()
+                self.gamepad.update()
+                sleep(Controller.two_frames)
+            except Exception as e:
+                raise e
