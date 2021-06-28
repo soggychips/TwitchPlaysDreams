@@ -16,6 +16,9 @@ class ControllerManagerProtocol:
             "dpad": self.controller.dpad,
             "stick": self.controller.stick,
             "trigger": self.controller.trigger,
+            None: lambda *_: self.logger.warning(
+                "type must be provided - message thrown out"
+            ),
         }
         super().__init__()
 
@@ -40,10 +43,29 @@ class ControllerManagerProtocol:
             self.logger.error("Error in datagram_received: {}".format(e))
 
     def parse_controller_command(self, data):
+        # determine input type
         if isinstance(data, dict):
-            self.controller.single(func=self.type_map[data["type"]], **data)
+            # single input
+            self.controller.single(
+                func=self.type_map.get(
+                    data.get("type"),
+                    lambda *_: logger.warning(
+                        "'{}' is not a supported type".format(data["type"])
+                    ),
+                ),
+                **data
+            )
         elif isinstance(data, list):
-            funcs = [self.type_map[msg["type"]] for msg in data]
+            # combination input
+            funcs = [
+                self.type_map.get(
+                    msg.get("type"),
+                    lambda *_: logger.warning(
+                        "'{}' is not a supported type".format(data["type"])
+                    ),
+                )
+                for msg in data
+            ]
             self.controller.combination(funcs, data)
         else:
             self.logger.warning("Unsupported message format: {}".format(type(data)))
