@@ -1,11 +1,9 @@
 import argparse
 import asyncio
 import logging
-
+import json
 from time import sleep
-
 from Controller import Controller
-from const import buttons, dpad_directions, triggers, sticks
 
 
 class ControllerManagerProtocol:
@@ -13,45 +11,42 @@ class ControllerManagerProtocol:
         self.controller = Controller()
         self.logger = logging.getLogger()
         sleep(1)
+        self.type_map = {
+            "button": self.controller.button,
+            "dpad": self.controller.dpad,
+            "stick": self.controller.stick,
+            "trigger": self.controller.trigger,
+        }
         super().__init__()
 
     def connection_made(self, transport):
         self.logger.info("Connected")
         self.transport = transport
 
-    def connection_lost(self, exc):
+    def connection_lost(self, _):
         self.logger.info("Connection closed")
 
-    def datagram_received(self, data, addr):
-        message = data.decode()
-        # invoke controller call
-        self.parse_controller_command(message)
+    def datagram_received(self, data, _):
+        try:
+            message = data.decode()
+            message = json.loads(message)
+            self.logger.debug("Message received: {}".format(message))
+        except Exception as e:
+            raise e
+        try:
+            # invoke controller call
+            self.parse_controller_command(message)
+        except Exception as e:
+            self.logger.error("Error in datagram_received: {}".format(e))
 
-    def parse_controller_command(self, message):
-        if isinstance(message, dict):
-            pass
-        elif isinstance(message, list):
-            pass
+    def parse_controller_command(self, data):
+        if isinstance(data, dict):
+            self.controller.single(func=self.type_map[data["type"]], **data)
+        elif isinstance(data, list):
+            funcs = [self.type_map[msg["type"]] for msg in data]
+            self.controller.combination(funcs, data)
         else:
-            self.logger.warning("Unsupported message format.")
-
-    def parse_controller_command_old(self, message):
-        message = message.lower().strip()
-        # taps
-        if message in buttons.keys():
-            self.logger.debug("Pressing {}".format(message))
-            self.controller.tap(buttons[message])
-        elif message in dpad_directions.keys():
-            self.logger.debug("Pressing DPAD {}".format(message))
-            self.controller.dpad(dpad_directions[message])
-        elif message in triggers:
-            self.logger.debug("Pressing trigger {}".format(message))
-            self.controller.trigger(message, amount=1)
-        elif message in sticks:
-            self.logger.debug("Moving stick {}")
-            self.controller.stick(message, x_value_float=1.0, y_value_float=0.0)
-        else:
-            self.logger.warning("Unsupported message: {}".format(message))
+            self.logger.warning("Unsupported message format: {}".format(type(data)))
 
 
 async def forever():
