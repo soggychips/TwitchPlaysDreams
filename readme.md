@@ -2,7 +2,7 @@
 
 <h3> About </h3>
 
-As of right now, this only works on Windows 10. I'll be looking into adding Mac OS support in the future.
+As of right now, this only works on Windows 10. I may or may not look into adding Mac OS support in the future.
 
 Controller is emulated using [vgamepad](https://github.com/yannbouteiller/vgamepad)
 
