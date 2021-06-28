@@ -4,5 +4,4 @@
 .python-version
 config
 vgamepad.py
-client_test.py
 venv
