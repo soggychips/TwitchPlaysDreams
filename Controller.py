@@ -50,7 +50,9 @@ class Controller:
     def combination(self, funcs, args):
         try:
             with self.lock:
-                length = float(max(arg.get("length", Controller.one_frame) for arg in args))
+                length = float(
+                    max(arg.get("length", Controller.one_frame) for arg in args)
+                )
                 for func, kwargs in zip(funcs, args):
                     func(kwargs.get("name"), kwargs.get("amount", 1))
                 self.gamepad.update()
