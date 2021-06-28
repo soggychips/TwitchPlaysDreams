@@ -60,7 +60,7 @@ async def main():
 
     loop = asyncio.get_event_loop()
 
-    transport, protocol = await loop.create_datagram_endpoint(
+    transport, _ = await loop.create_datagram_endpoint(
         lambda: ControllerManagerProtocol(), local_addr=("127.0.0.1", 9999)
     )
 

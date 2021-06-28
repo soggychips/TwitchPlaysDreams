@@ -1,4 +1,3 @@
-from functools import partial
 from threading import Lock
 from time import sleep
 import vgamepad as vg
@@ -17,10 +16,10 @@ class Controller:
         self.gamepad.reset()
         self.gamepad.update()
 
-    def button(self, name, amount):
+    def button(self, name, _):
         self.gamepad.press_button(name)
 
-    def dpad(self, name, amount):
+    def dpad(self, name, _):
         self.gamepad.directional_pad(name)
 
     def stick(self, name, amount):
