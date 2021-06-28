@@ -35,22 +35,22 @@ class Controller:
             self.gamepad.left_trigger_float(amount)
 
     def single(self, func, **kwargs):
-        length = kwargs.get("length", Controller.one_frame)
-        with self.lock:
-            try:
+        try:
+            with self.lock:
+                length = float(kwargs.get("length", Controller.one_frame))
                 func(kwargs.get("name"), kwargs.get("amount", 1))
                 self.gamepad.update()
                 sleep(length)
                 self.release_all()
                 self.gamepad.update()
                 sleep(Controller.two_frames)
-            except Exception as e:
-                raise e
+        except Exception as e:
+            raise Exception("Unexpected data of some kind in {}".format(kwargs), e)
 
     def combination(self, funcs, args):
-        with self.lock:
-            try:
-                length = max(arg.get("length", Controller.one_frame) for arg in args)
+        try:
+            with self.lock:
+                length = float(max(arg.get("length", Controller.one_frame) for arg in args))
                 for func, kwargs in zip(funcs, args):
                     func(kwargs.get("name"), kwargs.get("amount", 1))
                 self.gamepad.update()
@@ -58,5 +58,5 @@ class Controller:
                 self.release_all()
                 self.gamepad.update()
                 sleep(Controller.two_frames)
-            except Exception as e:
-                raise e
+        except Exception as e:
+            raise Exception("Unexpected data of some kind in {}".format(args), e)
