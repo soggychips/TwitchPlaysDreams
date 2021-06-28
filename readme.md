@@ -28,7 +28,7 @@ For runtime options, run server.py with the `-h` flag
 
 <h3> Message format:</h3>
 
-All messages need to be sent over UDP, in the following formats:
+All messages must be sent over UDP, as byte-encoded JSON data in the following formats:
 
 <b>Structure layout:</b>
 
