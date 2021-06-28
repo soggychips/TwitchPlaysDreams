@@ -1,6 +1,7 @@
 from threading import Lock
 from time import sleep
 import vgamepad as vg
+from const import buttons, dpad_directions, sticks, triggers
 
 
 class Controller:
@@ -17,13 +18,13 @@ class Controller:
         self.gamepad.update()
 
     def button(self, name, _):
-        self.gamepad.press_button(name)
+        self.gamepad.press_button(buttons[name])
 
     def dpad(self, name, _):
-        self.gamepad.directional_pad(name)
+        self.gamepad.directional_pad(dpad_directions[name])
 
     def stick(self, name, amount):
-        if name == "right":
+        if name == "r":
             self.gamepad.right_joystick_float(*amount)
         else:
             self.gamepad.left_joystick_float(*amount)
@@ -37,7 +38,7 @@ class Controller:
     def single(self, func, **kwargs):
         try:
             with self.lock:
-                length = float(kwargs.get("length", Controller.one_frame))
+                length = float(kwargs.get("length") or Controller.two_frames)
                 func(kwargs.get("name"), kwargs.get("amount", 1))
                 self.gamepad.update()
                 sleep(length)
@@ -51,7 +52,7 @@ class Controller:
         try:
             with self.lock:
                 length = float(
-                    max(arg.get("length", Controller.one_frame) for arg in args)
+                    max(arg.get("length") or Controller.two_frames for arg in args)
                 )
                 for func, kwargs in zip(funcs, args):
                     func(kwargs.get("name"), kwargs.get("amount", 1))
