@@ -1,3 +1,4 @@
+from functools import partial
 from threading import Lock
 from time import sleep
 import vgamepad as vg
@@ -12,90 +13,45 @@ class Controller:
         self.gamepad = vg.VDS4Gamepad()
         self.lock = Lock()
 
-    def tap(self, button):
-        """Emulates button tap"""
+    def release_all(self):
+        self.gamepad.reset()
+        self.gamepad.update()
+
+    def button(self, name, amount):
+        self.gamepad.press_button(name)
+
+    def dpad(self, name, amount):
+        self.gamepad.directional_pad(name)
+
+    def stick(self, name, amount):
+        if name == "right":
+            self.gamepad.right_joystick_float(*amount)
+        else:
+            self.gamepad.left_joystick_float(*amount)
+
+    def trigger(self, name, amount):
+        if name == "r2":
+            self.gamepad.right_trigger_float(amount)
+        else:
+            self.gamepad.left_trigger_float(amount)
+
+    def single(self, func, **kwargs):
+        length = kwargs.get("length", Controller.one_frame)
         with self.lock:
-            self.gamepad.press_button(button)
+            func(kwargs.get("name"), kwargs.get("amount"))
             self.gamepad.update()
-            sleep(Controller.one_frame)
-            self.gamepad.release_button(button)
+            sleep(length)
+            self.release_all()
             self.gamepad.update()
             sleep(Controller.two_frames)
 
-    def hold(self, button, seconds=1):
-        """Emulates button hold for amount given in seconds"""
+    def combination(self, funcs, args):
         with self.lock:
-            self.gamepad.press_button(button)
+            length = max(arg["length"] for arg in args)
+            for func, kwargs in zip(funcs, args):
+                func(kwargs.get("name"), kwargs.get("amount"))
             self.gamepad.update()
-            sleep(seconds)
-            self.gamepad.release_button(button)
-            self.gamepad.update()
-            sleep(Controller.two_frames)
-
-    def button(self, button, seconds=0.0):
-        with self.lock:
-            self.gamepad.press_button(button)
-            self.gamepad.update()
-            sleep(Controller.one_frame if seconds == 0.0 else seconds)
-            self.gamepad.release_button(button)
-            self.gamepad.update()
-            sleep(Controller.two_frames)
-
-    def dpad(self, direction, seconds=0.0):
-        """Emulates tapping of a dpad direction"""
-        with self.lock:
-            self.gamepad.directional_pad(direction)
-            self.gamepad.update()
-            sleep(Controller.one_frame if seconds == 0.0 else seconds)
-            self.gamepad.directional_pad(0x8)  # dpad None
-            self.gamepad.update()
-            sleep(Controller.two_frames)
-
-    def stick(self, stick, x_value_float=0.0, y_value_float=0.0, seconds=0.0):
-        stick = (
-            self.gamepad.left_joystick_float
-            if stick == "l"
-            else self.gamepad.right_joystick_float
-            if stick == "r"
-            else None
-        )
-        if stick is None:
-            raise Exception()
-        with self.lock:
-            stick(x_value_float=x_value_float, y_value_float=y_value_float)
-            self.gamepad.update()
-            sleep(Controller.one_frame if seconds == 0.0 else seconds)
-            stick(x_value_float=0.0, y_value_float=0.0)
-            self.gamepad.update()
-            sleep(Controller.two_frames)
-
-    def sticks(self, left_amounts=[0.0, 0.0], right_amounts=[0.0, 0.0], seconds=0.0):
-        zeros = [0.0, 0.0]
-        with self.lock:
-            self.gamepad.left_joystick_float(*left_amounts)
-            self.gamepad.right_joystick_float(*right_amounts)
-            self.gamepad.update()
-            sleep(Controller.one_frame if seconds == 0.0 else seconds)
-            self.gamepad.left_joystick_float(*zeros)
-            self.gamepad.right_joystick_float(*zeros)
-            self.gamepad.update()
-            sleep(Controller.two_frames)
-
-    def trigger(self, which_trigger, amount=1.0, seconds=0.0):
-        """Emulates a trigger pull (and release) for given amount"""
-        trigger_pull = (
-            self.gamepad.right_trigger_float
-            if which_trigger == "r2"
-            else self.gamepad.left_trigger_float
-            if which_trigger == "l2"
-            else None
-        )
-        if trigger_pull is None:
-            raise Exception()
-        with self.lock:
-            trigger_pull(value_float=amount)
-            self.gamepad.update()
-            sleep(Controller.one_frame if seconds == 0.0 else seconds)
-            trigger_pull(value_float=0.0)
+            sleep(length)
+            self.release_all()
             self.gamepad.update()
             sleep(Controller.two_frames)
