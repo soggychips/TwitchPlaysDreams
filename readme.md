@@ -6,7 +6,19 @@ As of right now, this only works on Windows 10. I may or may not look into addin
 
 Controller is emulated using [vgamepad](https://github.com/yannbouteiller/vgamepad)
 
+<h2> Users: </h2>
+
 <h3> Install </h3>
+
+First, you'll need to install the [ViGEmBus Driver](https://github.com/ViGEm/ViGEmBus/releases/tag/setup-v1.17.333)
+
+Then you can run the server.exe, which is in .\bin\win
+
+A log called twitchplays.log will be created in this folder, should there be any issues.
+
+
+
+<h2> Developers </h2>
 
 First, you'll need to install the [ViGEmBus Driver](https://github.com/ViGEm/ViGEmBus/releases/tag/setup-v1.17.333)
 
